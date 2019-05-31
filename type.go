@@ -55,3 +55,10 @@ type headerFrame struct {
 	Size       uint64
 	Properties properties
 }
+
+type methodFrame struct {
+	ChannelId uint16
+	ClassId   uint16
+	MethodId  uint16
+	Method    message
+}

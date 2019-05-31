@@ -28,3 +28,23 @@ type Connection struct {
 	Locales    []string
 	closed     int32
 }
+
+func (c *Connection) send(f frame) error {
+	if c.IsClosed() {
+		return ErrClosed
+	}
+	c.sendM.Lock()
+	err := c.writer.WirteFrame(f)
+	c.sendM.Unlock()
+	if err != nil {
+		go c.shutdown(&Error{
+			Code:   FrameError,
+			Reason: err.Error(),
+		})
+	} else {
+		select {
+		case c.sends <- time.Now():
+		default:
+		}
+	}
+}
